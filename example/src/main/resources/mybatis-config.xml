@@ -13,7 +13,7 @@
     </typeHandlers>
 
     <plugins>
-        <plugin interceptor="org.lysu.shard.interceptor.DbShardInterceptor" />
+        <plugin interceptor="org.lysu.shard.interceptor.PlanExecuteInterceptor" />
         <plugin interceptor="org.lysu.shard.interceptor.TableShardInterceptor" />
     </plugins>
 

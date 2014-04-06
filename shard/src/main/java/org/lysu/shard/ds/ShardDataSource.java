@@ -1,5 +1,6 @@
 package org.lysu.shard.ds;
 
+import org.lysu.shard.context.RouteDataSourceContext;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /**
@@ -17,7 +18,7 @@ public class ShardDataSource extends AbstractRoutingDataSource {
      */
     @Override
     protected Object determineCurrentLookupKey() {
-        return RoutingSetting.getRoutingInfo();
+        return RouteDataSourceContext.getRouteKey();
     }
 
 }

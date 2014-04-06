@@ -16,13 +16,6 @@ import java.lang.annotation.Target;
 public @interface TableShardWith {
 
     /**
-     * 多个条件时的次序.
-     *
-     * @return
-     */
-    int ordinal() default 0;
-
-    /**
      * 需要用被标注数据内部数据的情况.
      *
      * @return
