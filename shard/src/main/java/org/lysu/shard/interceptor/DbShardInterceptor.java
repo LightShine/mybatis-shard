@@ -1,13 +1,15 @@
 package org.lysu.shard.interceptor;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.lysu.shard.annotation.DbShard;
@@ -23,8 +25,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * @author lysu created on 14-4-6 下午3:57
@@ -34,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
         @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }),
         @Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class,
                 RowBounds.class, ResultHandler.class }) })
-public class DbShardInterceptor implements Interceptor {
+public class DbShardInterceptor extends AbstractShardInterceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -50,41 +52,87 @@ public class DbShardInterceptor implements Interceptor {
             return invocation.proceed();
         }
 
-        MappedStatement statement = (MappedStatement) args[0];
+        String routingKey = routeKey(args);
 
-        Object parameterObject = args[1];
-
-        String command = statement.getId();
-
-        String _mapperName = StringUtils.substringBeforeLast(command, ".");
-        String _methodName = StringUtils.substringAfterLast(command, ".");
-
-        Class<?> mapperClazz = null;
-        try {
-            mapperClazz = Class.forName(_mapperName);
-        } catch (ClassNotFoundException e) {
+        if (isNullOrEmpty(routingKey)) {
+            return invocation.proceed();
         }
 
-        if (mapperClazz == null) {
+        try {
+            RoutingSetting.setRoutingInfo(routingKey);
             return invocation.proceed();
+        } finally {
+            RoutingSetting.clearRoutingInfo();
+        }
+
+    }
+
+    private String routeKey(Object[] args) {
+        MappedStatement mappedStatement = (MappedStatement) args[0];
+
+        Class<?> mapperClazz = mapperClazz(mappedStatement);
+        if (mapperClazz == null) {
+            return null;
         }
 
         DbShard dbShardConfig = mapperClazz.getAnnotation(DbShard.class);
+        if (dbShardConfig == null) {
+            return null;
+        }
 
-        Method methodClazz = null;
-        for (Method method : mapperClazz.getMethods()) {
-            if (Objects.equal(method.getName(), _methodName)) {
-                methodClazz = method;
+        Method mapperMethod = shardMapperMethod(mappedStatement, mapperClazz);
+        if (mapperMethod == null || ArrayUtils.isEmpty(mapperMethod.getParameterTypes())) {
+            return null;
+        }
+
+        List<DbParameter> dbParameterList = shardParams(mapperMethod);
+        if (CollectionUtils.isEmpty(dbParameterList)) {
+            return null;
+        }
+
+        List<Object> sharedValues = shareValue(args[1], dbParameterList);
+
+        if (CollectionUtils.isEmpty(sharedValues)) {
+            return null;
+        }
+
+        Locator locator = Locators.instance.takeLocator(checkNotNull(dbShardConfig.rule()));
+        String dbSuffix = locator.locate(sharedValues);
+
+        if (isNullOrEmpty(dbSuffix)) {
+            return null;
+        }
+
+        return dbShardConfig.dbKey() + "_" + dbSuffix;
+
+    }
+
+    private List<Object> shareValue(Object parameterObject, List<DbParameter> dbParameterList) {
+        List<Object> sharedValues = Lists.newArrayList();
+
+        for (DbParameter paramInfo : dbParameterList) {
+
+            DbShardWith dbShardWith = paramInfo.getDbShardWith();
+
+            // 原生参数的处理方法.
+            if (ArrayUtils.isEmpty(dbShardWith.props())) {
+                sharedValues.add(takeRawParameterValue(parameterObject, paramInfo.getParam()));
+                continue;
             }
-        }
 
-        if (methodClazz == null) {
-            return invocation.proceed();
-        }
+            // 非原生带内嵌参数的处理.
+            for (String prop : dbShardWith.props()) {
+                sharedValues.add(checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
+            }
 
+        }
+        return sharedValues;
+    }
+
+    private List<DbParameter> shardParams(Method mapperMethod) {
         List<DbParameter> dbParameterList = Lists.newArrayList();
 
-        for (Annotation[] annotations : methodClazz.getParameterAnnotations()) {
+        for (Annotation[] annotations : mapperMethod.getParameterAnnotations()) {
             for (Annotation annotation : annotations) {
 
                 DbShardWith dbShardWith = null;
@@ -106,42 +154,7 @@ public class DbShardInterceptor implements Interceptor {
 
             }
         }
-
-        List<Object> sharedValues = Lists.newArrayList();
-
-        for (DbParameter paramInfo : dbParameterList) {
-
-            DbShardWith dbShardWith = paramInfo.getDbShardWith();
-
-            // 原生参数的处理方法.
-            if (ArrayUtils.isEmpty(dbShardWith.props())) {
-                Param batisParam = paramInfo.getParam();
-                // this is dirt and wait to improve...
-                checkNotNull(batisParam, "@TableShardWith标注的基本基本数据类型参数必须有@Param注解命名");
-                Object value = Reflections.getPropertyValue(parameterObject, batisParam.value());
-                checkArgument(value.getClass().isPrimitive(), "没有prop属性的@TableShardWith注解只能针对基本类型");
-                sharedValues.add(value);
-                continue;
-            }
-
-            // 非原生带内嵌参数的处理.
-            for (String prop : dbShardWith.props()) {
-                sharedValues.add(checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
-            }
-
-        }
-
-        Locator locator = Locators.instance.takeLocator(checkNotNull(dbShardConfig.rule()));
-        String dbSuffix = locator.locate(sharedValues);
-
-        String routingKey = dbShardConfig.dbKey() + "_" + dbSuffix;
-        try {
-            RoutingSetting.setRoutingInfo(routingKey);
-            return invocation.proceed();
-        } finally {
-            RoutingSetting.clearRoutingInfo();
-        }
-
+        return dbParameterList;
     }
 
     @Override

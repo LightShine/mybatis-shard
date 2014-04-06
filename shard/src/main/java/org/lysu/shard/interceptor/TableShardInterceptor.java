@@ -1,7 +1,6 @@
 package org.lysu.shard.interceptor;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -11,7 +10,10 @@ import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.lysu.shard.annotation.TableShard;
 import org.lysu.shard.annotation.TableShardWith;
 import org.lysu.shard.converter.SqlConverterFactory;
@@ -26,7 +28,6 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Properties;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -34,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @version $Id$
  */
 @Intercepts({ @Signature(type = StatementHandler.class, method = "prepare", args = { Connection.class }) })
-public class TableShardInterceptor implements Interceptor {
+public class TableShardInterceptor extends AbstractShardInterceptor {
 
     public Object intercept(Invocation invocation) throws Throwable {
 
@@ -79,37 +80,16 @@ public class TableShardInterceptor implements Interceptor {
 
         List<Object> shardValues = sharedValue(shardParams, boundSql);
 
+        if (CollectionUtils.isEmpty(shardValues)) {
+            return null;
+        }
+
         Locator locator = Locators.instance.takeLocator(checkNotNull(tableShardConfig.rule()));
         String targetSuffix = locator.locate(shardValues);
 
         SqlConverterFactory converterFactory = SqlConverterFactory.getInstance();
         return converterFactory.convert(boundSql.getSql(), targetSuffix, checkNotNull(tableShardConfig.tablePattern()));
 
-    }
-
-    private Class<?> mapperClazz(MappedStatement mappedStatement) {
-        String mapperId = mappedStatement.getId();
-
-        String _mapperClazz = StringUtils.substringBeforeLast(mapperId, ".");
-
-        Class<?> mapperClazz = null;
-        try {
-            mapperClazz = Class.forName(_mapperClazz);
-        } catch (ClassNotFoundException e) {
-        }
-        return mapperClazz;
-    }
-
-    private Method shardMapperMethod(MappedStatement mappedStatement, Class<?> mapperClazz) {
-        String _mapperMethod = StringUtils.substringAfterLast(mappedStatement.getId(), ".");
-
-        Method mapperMethod = null;
-        for (Method method : mapperClazz.getMethods()) {
-            if (Objects.equal(method.getName(), _mapperMethod)) {
-                mapperMethod = method;
-            }
-        }
-        return mapperMethod;
     }
 
     private List<TableParameter> shardParams(Method mapperMethod) {
@@ -154,14 +134,7 @@ public class TableShardInterceptor implements Interceptor {
 
             // 原生参数的处理方法.
             if (ArrayUtils.isEmpty(tableShardWith.props())) {
-                Param batisParam = paramInfo.getParam();
-                // this is dirt and wait to improve...
-                checkNotNull(batisParam, "@TableShardWith标注的基本基本数据类型参数必须有@Param注解命名");
-                String name = batisParam.value();
-                checkArgument(StringUtils.isNotEmpty(name));
-                Object value = Reflections.getPropertyValue(parameterObject, name);
-                checkArgument(value.getClass().isPrimitive(), "没有prop属性的@TableShardWith注解只能针对基本类型");
-                sharedValues.add(value);
+                sharedValues.add(takeRawParameterValue(parameterObject, paramInfo.getParam()));
                 continue;
             }
 
