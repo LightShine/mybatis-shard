@@ -2,7 +2,9 @@ package org.lysu.shard.interceptor;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -26,6 +28,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -78,9 +81,9 @@ public class TableShardInterceptor extends AbstractShardInterceptor {
             return null;
         }
 
-        List<Object> shardValues = sharedValue(shardParams, boundSql);
+        Map<String, Object> shardValues = sharedValue(shardParams, boundSql);
 
-        if (CollectionUtils.isEmpty(shardValues)) {
+        if (MapUtils.isEmpty(shardValues)) {
             return null;
         }
 
@@ -122,9 +125,9 @@ public class TableShardInterceptor extends AbstractShardInterceptor {
         return params;
     }
 
-    private List<Object> sharedValue(List<TableParameter> shardParams, BoundSql boundSql) {
+    private Map<String, Object> sharedValue(List<TableParameter> shardParams, BoundSql boundSql) {
 
-        List<Object> sharedValues = Lists.newArrayList();
+        Map<String, Object> sharedValues = Maps.newHashMap();
 
         for (TableParameter paramInfo : shardParams) {
 
@@ -134,13 +137,14 @@ public class TableShardInterceptor extends AbstractShardInterceptor {
 
             // 原生参数的处理方法.
             if (ArrayUtils.isEmpty(tableShardWith.props())) {
-                sharedValues.add(takeRawParameterValue(parameterObject, paramInfo.getParam()));
+                sharedValues.put(paramInfo.getParam().value(),
+                        takeRawParameterValue(parameterObject, paramInfo.getParam()));
                 continue;
             }
 
             // 非原生带内嵌参数的处理.
             for (String prop : tableShardWith.props()) {
-                sharedValues.add(checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
+                sharedValues.put(prop, checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
             }
 
         }

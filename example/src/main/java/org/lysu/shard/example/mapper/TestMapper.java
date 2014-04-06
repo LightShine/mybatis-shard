@@ -14,8 +14,8 @@ import java.util.Map;
  * @author lysu created on 14-4-6 下午4:32
  * @version $Id$
  */
-@DbShard(dbKey = "ds", rule = "#$ % 2")
-@TableShard(tablePattern = "test", rule = "#$ % 4")
+@DbShard(dbKey = "ds", rule = "$a$ % 2")
+@TableShard(tablePattern = "test", rule = "leftPad($a$ % 4, 3)")
 @Repository
 public interface TestMapper {
 

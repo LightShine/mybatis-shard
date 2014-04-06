@@ -1,7 +1,9 @@
 package org.lysu.shard.interceptor;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.executor.Executor;
@@ -23,6 +25,7 @@ import org.lysu.shard.tools.Reflections;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -90,9 +93,9 @@ public class DbShardInterceptor extends AbstractShardInterceptor {
             return null;
         }
 
-        List<Object> sharedValues = shareValue(args[1], dbParameterList);
+        Map<String, Object> sharedValues = shareValue(args[1], dbParameterList);
 
-        if (CollectionUtils.isEmpty(sharedValues)) {
+        if (MapUtils.isEmpty(sharedValues)) {
             return null;
         }
 
@@ -107,8 +110,8 @@ public class DbShardInterceptor extends AbstractShardInterceptor {
 
     }
 
-    private List<Object> shareValue(Object parameterObject, List<DbParameter> dbParameterList) {
-        List<Object> sharedValues = Lists.newArrayList();
+    private Map<String, Object> shareValue(Object parameterObject, List<DbParameter> dbParameterList) {
+        Map<String, Object> sharedValues = Maps.newHashMap();
 
         for (DbParameter paramInfo : dbParameterList) {
 
@@ -116,13 +119,14 @@ public class DbShardInterceptor extends AbstractShardInterceptor {
 
             // 原生参数的处理方法.
             if (ArrayUtils.isEmpty(dbShardWith.props())) {
-                sharedValues.add(takeRawParameterValue(parameterObject, paramInfo.getParam()));
+                sharedValues.put(paramInfo.getParam().value(),
+                        takeRawParameterValue(parameterObject, paramInfo.getParam()));
                 continue;
             }
 
             // 非原生带内嵌参数的处理.
             for (String prop : dbShardWith.props()) {
-                sharedValues.add(checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
+                sharedValues.put(prop, checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
             }
 
         }

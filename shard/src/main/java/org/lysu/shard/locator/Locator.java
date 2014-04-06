@@ -1,6 +1,6 @@
 package org.lysu.shard.locator;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author lysu created on 14-4-6 下午3:52
@@ -8,7 +8,6 @@ import java.util.List;
  */
 public interface Locator {
 
-    String locate(List<Object> locateKey);
+    String locate(Map<String, Object> locateParam);
 
 }
-
