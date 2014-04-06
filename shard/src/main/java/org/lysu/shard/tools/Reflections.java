@@ -1,5 +1,8 @@
 package org.lysu.shard.tools;
 
+import com.google.common.base.Throwables;
+import org.apache.commons.beanutils.PropertyUtils;
+
 import java.lang.reflect.*;
 
 /**
@@ -46,6 +49,19 @@ public class Reflections {
 
         }
         return result;
+    }
+    
+    public static Object getPropertyValue(Object object, String propertyName) {
+        try {
+            return PropertyUtils.getProperty(object, propertyName);
+        } catch (IllegalAccessException e) {
+            Throwables.propagate(e);
+        } catch (InvocationTargetException e) {
+            Throwables.propagate(e);
+        } catch (NoSuchMethodException e) {
+            Throwables.propagate(e);
+        }
+        return null;
     }
 
     /**

@@ -24,7 +24,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -149,7 +148,7 @@ public class TableShardInterceptor implements Interceptor {
 
         for (TableParameter paramInfo : shardParams) {
 
-            Map parameterObject = (Map) boundSql.getParameterObject();
+            Object parameterObject = boundSql.getParameterObject();
 
             TableShardWith tableShardWith = paramInfo.getTableShardWith();
 
@@ -160,7 +159,7 @@ public class TableShardInterceptor implements Interceptor {
                 checkNotNull(batisParam, "@TableShardWith标注的基本基本数据类型参数必须有@Param注解命名");
                 String name = batisParam.value();
                 checkArgument(StringUtils.isNotEmpty(name));
-                Object value = parameterObject.get(name);
+                Object value = Reflections.getPropertyValue(parameterObject, name);
                 checkArgument(value.getClass().isPrimitive(), "没有prop属性的@TableShardWith注解只能针对基本类型");
                 sharedValues.add(value);
                 continue;
@@ -168,7 +167,7 @@ public class TableShardInterceptor implements Interceptor {
 
             // 非原生带内嵌参数的处理.
             for (String prop : tableShardWith.props()) {
-                sharedValues.add(checkNotNull(parameterObject.get(prop)));
+                sharedValues.add(checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
             }
 
         }

@@ -16,11 +16,11 @@ import org.lysu.shard.ds.RoutingSetting;
 import org.lysu.shard.locator.Locator;
 import org.lysu.shard.locator.Locators;
 import org.lysu.shard.mapperinfo.DbParameter;
+import org.lysu.shard.tools.Reflections;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -41,7 +41,7 @@ public class DbShardInterceptor implements Interceptor {
 
         Object[] args = invocation.getArgs();
 
-        if (args.length != 2) {
+        if (args.length < 2) {
             return invocation.proceed();
         }
 
@@ -52,11 +52,7 @@ public class DbShardInterceptor implements Interceptor {
 
         MappedStatement statement = (MappedStatement) args[0];
 
-        if (!(args[1] instanceof Map)) {
-            return invocation.proceed();
-        }
-
-        Map parameterObject = (Map) args[1];
+        Object parameterObject = args[1];
 
         String command = statement.getId();
 
@@ -122,7 +118,7 @@ public class DbShardInterceptor implements Interceptor {
                 Param batisParam = paramInfo.getParam();
                 // this is dirt and wait to improve...
                 checkNotNull(batisParam, "@TableShardWith标注的基本基本数据类型参数必须有@Param注解命名");
-                Object value = parameterObject.get(batisParam.value());
+                Object value = Reflections.getPropertyValue(parameterObject, batisParam.value());
                 checkArgument(value.getClass().isPrimitive(), "没有prop属性的@TableShardWith注解只能针对基本类型");
                 sharedValues.add(value);
                 continue;
@@ -130,7 +126,7 @@ public class DbShardInterceptor implements Interceptor {
 
             // 非原生带内嵌参数的处理.
             for (String prop : dbShardWith.props()) {
-                sharedValues.add(checkNotNull(parameterObject.get(prop)));
+                sharedValues.add(checkNotNull(Reflections.getPropertyValue(parameterObject, prop)));
             }
 
         }
