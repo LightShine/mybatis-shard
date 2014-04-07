@@ -6,8 +6,8 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.lysu.shard.context.ExecuteInfoContext;
-import org.lysu.shard.execute.ExecuteInfo;
-import org.lysu.shard.execute.ExecuteInfoBuilder;
+import org.lysu.shard.config.ExecutionConfig;
+import org.lysu.shard.config.ExecutionConfigBuilder;
 
 import java.util.Properties;
 
@@ -35,7 +35,7 @@ public class PlanExecuteInterceptor implements Interceptor {
             return invocation.proceed();
         }
 
-        ExecuteInfo executeInfo = ExecuteInfoBuilder.instance.build((MappedStatement) args[0], args[1]);
+        ExecutionConfig executeInfo = ExecutionConfigBuilder.instance.build((MappedStatement) args[0], args[1]);
 
         if (executeInfo == null) {
             return invocation.proceed();

@@ -1,4 +1,4 @@
-package org.lysu.shard.execute;
+package org.lysu.shard.config;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
@@ -23,11 +23,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author lysu created on 14-4-7 上午2:30
  * @version $Id$
  */
-public enum ExecuteInfoBuilder {
+public enum ExecutionConfigBuilder {
 
     instance;
 
-    public ExecuteInfo build(MappedStatement mappedStatement, Object executeParam) {
+    public ExecutionConfig build(MappedStatement mappedStatement, Object executeParam) {
 
         Class<?> mapperClazz = mapperClazz(mappedStatement);
         if (mapperClazz == null) {
@@ -43,19 +43,19 @@ public enum ExecuteInfoBuilder {
             return null;
         }
 
-        DataSourceInfo dataSourceInfo = buildDataSourceInfo(mapperMethod, dbAnnotation, executeParam);
+        DataSourceConfig dataSourceConfig = buildDataSourceInfo(mapperMethod, dbAnnotation, executeParam);
 
-        TableInfo tableInfo = buildTableInfo(mapperMethod, tableAnnotation, executeParam);
+        TableConfig tableConfig = buildTableInfo(mapperMethod, tableAnnotation, executeParam);
 
-        if (dataSourceInfo == null && tableInfo == null) {
+        if (dataSourceConfig == null && tableConfig == null) {
             return null;
         }
 
-        return new ExecuteInfo(dataSourceInfo, tableInfo);
+        return new ExecutionConfig(dataSourceConfig, tableConfig);
 
     }
 
-    private TableInfo buildTableInfo(Method mapperMethod, TableShard tableAnnotation, Object executeParam) {
+    private TableConfig buildTableInfo(Method mapperMethod, TableShard tableAnnotation, Object executeParam) {
 
         Map<String, Object> params = Maps.newHashMap();
         for (Annotation[] annotations : mapperMethod.getParameterAnnotations()) {
@@ -89,15 +89,15 @@ public enum ExecuteInfoBuilder {
             }
         }
 
-        TableInfo tableInfo = new TableInfo();
-        tableInfo.setTablePattern(tableAnnotation.tablePattern());
-        tableInfo.setRule(tableAnnotation.rule());
-        tableInfo.setParams(params);
-        return tableInfo;
+        TableConfig tableConfig = new TableConfig();
+        tableConfig.setTablePattern(tableAnnotation.tablePattern());
+        tableConfig.setRule(tableAnnotation.rule());
+        tableConfig.setParams(params);
+        return tableConfig;
 
     }
 
-    private DataSourceInfo buildDataSourceInfo(Method mapperMethod, DbShard dbShardAnnotation, Object executeParam) {
+    private DataSourceConfig buildDataSourceInfo(Method mapperMethod, DbShard dbShardAnnotation, Object executeParam) {
 
         Map<String, Object> params = Maps.newHashMap();
         for (Annotation[] annotations : mapperMethod.getParameterAnnotations()) {
@@ -132,12 +132,12 @@ public enum ExecuteInfoBuilder {
             }
         }
 
-        DataSourceInfo dataSourceInfo = new DataSourceInfo();
-        dataSourceInfo.setDataSourceName(dbShardAnnotation.dbKey());
-        dataSourceInfo.setRule(dbShardAnnotation.rule());
-        dataSourceInfo.setParams(params);
+        DataSourceConfig dataSourceConfig = new DataSourceConfig();
+        dataSourceConfig.setDataSourceName(dbShardAnnotation.dbKey());
+        dataSourceConfig.setRule(dbShardAnnotation.rule());
+        dataSourceConfig.setParams(params);
 
-        return dataSourceInfo;
+        return dataSourceConfig;
     }
 
     private Class<?> mapperClazz(MappedStatement mappedStatement) {

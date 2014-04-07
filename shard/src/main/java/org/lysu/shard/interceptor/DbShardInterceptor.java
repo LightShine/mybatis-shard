@@ -3,8 +3,8 @@ package org.lysu.shard.interceptor;
 import org.apache.ibatis.plugin.Invocation;
 import org.lysu.shard.context.ExecuteInfoContext;
 import org.lysu.shard.context.RouteDataSourceContext;
-import org.lysu.shard.execute.DataSourceInfo;
-import org.lysu.shard.execute.ExecuteInfo;
+import org.lysu.shard.config.DataSourceConfig;
+import org.lysu.shard.config.ExecutionConfig;
 import org.lysu.shard.locator.Locator;
 import org.lysu.shard.locator.Locators;
 
@@ -37,26 +37,26 @@ enum DbShardInterceptor {
 
     private String routeKey() {
 
-        ExecuteInfo executeInfo = ExecuteInfoContext.getExecuteInfo();
+        ExecutionConfig executeInfo = ExecuteInfoContext.getExecuteInfo();
 
         if (executeInfo == null) {
             return null;
         }
 
-        DataSourceInfo dataSourceInfo = executeInfo.getDataSourceInfo();
+        DataSourceConfig dataSourceConfig = executeInfo.getDataSourceConfig();
 
-        if (dataSourceInfo == null) {
+        if (dataSourceConfig == null) {
             return null;
         }
 
-        Locator locator = Locators.instance.takeLocator(dataSourceInfo.getRule());
-        String dbSuffix = locator.locate(dataSourceInfo.getParams());
+        Locator locator = Locators.instance.takeLocator(dataSourceConfig.getRule());
+        String dbSuffix = locator.locate(dataSourceConfig.getParams());
 
         if (isNullOrEmpty(dbSuffix)) {
             return null;
         }
 
-        return dataSourceInfo.getDataSourceName() + "_" + dbSuffix;
+        return dataSourceConfig.getDataSourceName() + "_" + dbSuffix;
 
     }
 

@@ -1,4 +1,4 @@
-package org.lysu.shard.execute;
+package org.lysu.shard.config;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -10,7 +10,7 @@ import java.util.Set;
  * @author lysu created on 14-4-7 上午1:44
  * @version $Id$
  */
-public class DataSourceInfo {
+public class DataSourceConfig {
 
     private Set<String> availableKey = Sets.newHashSet();
 

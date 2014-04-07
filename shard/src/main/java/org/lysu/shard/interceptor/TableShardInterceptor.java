@@ -7,8 +7,8 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.plugin.*;
 import org.lysu.shard.context.ExecuteInfoContext;
 import org.lysu.shard.converter.SqlConverterFactory;
-import org.lysu.shard.execute.ExecuteInfo;
-import org.lysu.shard.execute.TableInfo;
+import org.lysu.shard.config.ExecutionConfig;
+import org.lysu.shard.config.TableConfig;
 import org.lysu.shard.locator.Locator;
 import org.lysu.shard.locator.Locators;
 import org.lysu.shard.tools.Reflections;
@@ -45,23 +45,23 @@ public class TableShardInterceptor implements Interceptor {
     @VisibleForTesting
     String tryConvertSql(BoundSql boundSql) {
 
-        ExecuteInfo executeInfo = ExecuteInfoContext.getExecuteInfo();
+        ExecutionConfig executeInfo = ExecuteInfoContext.getExecuteInfo();
 
         if (executeInfo == null) {
             return null;
         }
 
-        TableInfo tableInfo = executeInfo.getTableInfo();
+        TableConfig tableConfig = executeInfo.getTableConfig();
 
-        if (tableInfo == null) {
+        if (tableConfig == null) {
             return null;
         }
 
-        Locator locator = Locators.instance.takeLocator(checkNotNull(tableInfo.getRule()));
-        String targetSuffix = locator.locate(tableInfo.getParams());
+        Locator locator = Locators.instance.takeLocator(checkNotNull(tableConfig.getRule()));
+        String targetSuffix = locator.locate(tableConfig.getParams());
 
         SqlConverterFactory converterFactory = SqlConverterFactory.getInstance();
-        return converterFactory.convert(boundSql.getSql(), targetSuffix, checkNotNull(tableInfo.getTablePattern()));
+        return converterFactory.convert(boundSql.getSql(), targetSuffix, checkNotNull(tableConfig.getTablePattern()));
 
     }
 

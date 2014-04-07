@@ -1,4 +1,4 @@
-package org.lysu.shard.execute;
+package org.lysu.shard.config;
 
 import com.google.common.collect.Maps;
 
@@ -8,7 +8,7 @@ import java.util.Map;
  * @author lysu created on 14-4-7 上午1:44
  * @version $Id$
  */
-public class TableInfo {
+public class TableConfig {
 
     private String tablePattern;
 
