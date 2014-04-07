@@ -8,12 +8,12 @@ public class RouteDataSourceContext {
 
     private static final ThreadLocal<String> contextHolder = new ThreadLocal<String>();
 
-    public static void setRouteKey(String routeKey) {
-        contextHolder.set(routeKey);
-    }
-
     public static String getRouteKey() {
         return (String) contextHolder.get();
+    }
+
+    public static void setRouteKey(String routeKey) {
+        contextHolder.set(routeKey);
     }
 
     public static void clearRouteKey() {

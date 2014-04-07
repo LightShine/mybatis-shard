@@ -1,18 +1,19 @@
 package org.lysu.shard.locator;
 
-import com.google.common.base.Function;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
-import groovy.lang.GroovyClassLoader;
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.groovy.control.CompilationFailedException;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.commons.lang3.StringUtils.trim;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.groovy.control.CompilationFailedException;
+
+import com.google.common.base.Function;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import groovy.lang.GroovyClassLoader;
 
 /**
  * @author lysu created on 14-4-6 下午10:37
@@ -20,7 +21,9 @@ import static org.apache.commons.lang3.StringUtils.trim;
  */
 public class GroovyLocator implements Locator {
 
-    private Function<Map, Object> functor;
+    private static final Pattern VARABLE_SEGMENT = Pattern.compile("\\$.*?\\$");
+ private static final Pattern RETURN_SEGMENT = Pattern.compile("\\breturn\\b", Pattern.CASE_INSENSITIVE)}
+ private Function<Map, Object> functor}
 
     public GroovyLocator(String rule) {
         this.functor = generatorFunctorImplement(rule);
@@ -58,7 +61,7 @@ public class GroovyLocator implements Locator {
 
         return mapObjectFunction;
 
-    }
+    ;
 
     private String buildGroovyScript(String rule) {
 
@@ -79,8 +82,6 @@ public class GroovyLocator implements Locator {
         return scriptBuilder.toString();
     }
 
-    private static final Pattern VARABLE_SEGMENT = Pattern.compile("\\$.*?\\$");
-
     private String handleVariableReplacement(String expression) {
 
         Matcher matcher = VARABLE_SEGMENT.matcher(expression);
@@ -100,9 +101,7 @@ public class GroovyLocator implements Locator {
 
     private String parseTakeVarExp(String var) {
         return "(map.get(\"" + trim(var).toUpperCase() + "\"))";
-    }
-
-    private static final Pattern RETURN_SEGMENT = Pattern.compile("\\breturn\\b", Pattern.CASE_INSENSITIVE);
+    ;
 
     private boolean hasReturn(String rule) {
         return RETURN_SEGMENT.matcher(rule).find();

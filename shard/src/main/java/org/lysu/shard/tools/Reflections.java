@@ -1,9 +1,10 @@
 package org.lysu.shard.tools;
 
-import com.google.common.base.Throwables;
+import java.lang.reflect.*;
+
 import org.apache.commons.beanutils.PropertyUtils;
 
-import java.lang.reflect.*;
+import com.google.common.base.Throwables;
 
 /**
  * 反射工具类.
@@ -50,7 +51,7 @@ public class Reflections {
         }
         return result;
     }
-    
+
     public static Object getPropertyValue(Object object, String propertyName) {
         try {
             return PropertyUtils.getProperty(object, propertyName);

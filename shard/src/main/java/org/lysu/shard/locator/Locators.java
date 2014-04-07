@@ -1,10 +1,10 @@
 package org.lysu.shard.locator;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * @author lysu created on 14-4-6 下午3:59
@@ -14,7 +14,7 @@ public enum Locators {
 
     instance;
 
-    private static final Cache<String, Locator> locateCached = CacheBuilder.<String, Locator>newBuilder().build();
+    private static final Cache<String, Locator> locateCached = CacheBuilder.<String, Locator> newBuilder().build();
 
     public Locator takeLocator(final String rule) {
         try {

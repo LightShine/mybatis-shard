@@ -10,12 +10,12 @@ public class ExecuteInfoContext {
 
     private static final ThreadLocal<ExecutionConfig> contextHolder = new ThreadLocal<ExecutionConfig>();
 
-    public static void setExecuteInfo(ExecutionConfig executeInfo) {
-        contextHolder.set(executeInfo);
-    }
-
     public static ExecutionConfig getExecuteInfo() {
         return (ExecutionConfig) contextHolder.get();
+    }
+
+    public static void setExecuteInfo(ExecutionConfig executeInfo) {
+        contextHolder.set(executeInfo);
     }
 
     public static void clearExecuteInfo() {

@@ -3,7 +3,10 @@
  */
 package org.lysu.shard.converter;
 
-import com.google.common.base.Throwables;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
@@ -11,15 +14,14 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.update.Update;
+
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.base.Throwables;
 
 /**
- *
+ * 
  * @author lysu created on 14-4-6 下午3:31
  * @version $Id$
  */
@@ -30,18 +32,16 @@ public class SqlConverterFactory {
     static {
         factory = new SqlConverterFactory();
     }
-
-    public static SqlConverterFactory getInstance() {
-        return factory;
-    }
-
-    private Map<String, SqlConverter> converterMap;
-    private CCJSqlParserManager pm;
-
+  private Map<String, SqlConverter> converterMa }
+  private CCJSqlParserManager pp;
     private SqlConverterFactory() {
         converterMap = new HashMap<String, SqlConverter>();
         pm = new CCJSqlParserManager();
         register();
+   m;
+
+    public static SqlConverterFactory getInstance() {
+        return factory;
     }
 
     private void register() {

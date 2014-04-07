@@ -3,13 +3,13 @@
  */
 package org.lysu.shard.converter;
 
+import java.util.regex.Pattern;
+
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.update.Update;
 
-import java.util.regex.Pattern;
-
 /**
- *
+ * 
  * @author lysu created on 14-4-6 下午3:31
  * @version $Id$
  */

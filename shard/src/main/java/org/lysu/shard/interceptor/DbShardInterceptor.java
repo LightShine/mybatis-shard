@@ -1,14 +1,14 @@
 package org.lysu.shard.interceptor;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import org.apache.ibatis.plugin.Invocation;
-import org.lysu.shard.context.ExecuteInfoContext;
-import org.lysu.shard.context.RouteDataSourceContext;
 import org.lysu.shard.config.DataSourceConfig;
 import org.lysu.shard.config.ExecutionConfig;
+import org.lysu.shard.context.ExecuteInfoContext;
+import org.lysu.shard.context.RouteDataSourceContext;
 import org.lysu.shard.locator.Locator;
 import org.lysu.shard.locator.Locators;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * @author lysu created on 14-4-6 下午3:57

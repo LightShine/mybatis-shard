@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * 表区分策略注解
- *
+ * 
  * @author lysu created on 14-4-6 下午3:38
  * @version $Id$
  */
@@ -17,14 +17,14 @@ public @interface TableShard {
 
     /**
      * 参与分表区分的表明表达式.
-     *
+     * 
      * @return
      */
     String tablePattern();
 
     /**
      * 选择表的规则.
-     *
+     * 
      * @return
      */
     String rule();

@@ -34,4 +34,3 @@ public class ExecutionConfig {
         this.tableConfig = tableConfig;
     }
 }
-

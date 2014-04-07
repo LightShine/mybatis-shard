@@ -48,12 +48,7 @@ public class Test {
 
     @Override
     public String toString() {
-        return "Test{" +
-                "id=" + id +
-                ", a=" + a +
-                ", b=" + b +
-                ", c=" + c +
-                '}';
+        return "Test{" + "id=" + id + ", a=" + a + ", b=" + b + ", c=" + c + '}';
     }
 
 }

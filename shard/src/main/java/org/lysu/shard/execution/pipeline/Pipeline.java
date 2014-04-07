@@ -53,5 +53,4 @@ public interface Pipeline {
 
     void doUpstream(PipelineEvent event);
 
-
 }

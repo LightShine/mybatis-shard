@@ -1,9 +1,9 @@
 package org.lysu.shard.locator;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-
-import java.util.Date;
 
 /**
  * @author lysu created on 14-4-7 上午12:43

@@ -1,14 +1,14 @@
 package org.lysu.shard.example.mapper;
 
+import java.util.List;
+import java.util.Map;
+
 import org.lysu.shard.annotation.DbShard;
 import org.lysu.shard.annotation.DbShardWith;
 import org.lysu.shard.annotation.TableShard;
 import org.lysu.shard.annotation.TableShardWith;
 import org.lysu.shard.example.model.Test;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author lysu created on 14-4-6 下午4:32
@@ -19,9 +19,9 @@ import java.util.Map;
 @Repository
 public interface TestMapper {
 
-    public void save(@DbShardWith(props = "a") @TableShardWith(props = "a")Test test);
+    public void save(@DbShardWith(props = "a") @TableShardWith(props = "a") Test test);
 
-    public List<Test> query(@DbShardWith(props = "a") @TableShardWith(props = "a")Map<String, Object> param);
+    public List<Test> query(@DbShardWith(props = "a") @TableShardWith(props = "a") Map<String, Object> param);
 
     public void update(@DbShardWith(props = "a") @TableShardWith(props = "a") Map<String, Object> param);
 

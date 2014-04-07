@@ -1,8 +1,8 @@
 package org.lysu.shard.config;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * @author lysu created on 14-4-7 上午1:44

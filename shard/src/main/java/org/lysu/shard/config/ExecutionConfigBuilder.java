@@ -1,7 +1,12 @@
 package org.lysu.shard.config;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Map;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -12,12 +17,8 @@ import org.lysu.shard.annotation.TableShard;
 import org.lysu.shard.annotation.TableShardWith;
 import org.lysu.shard.tools.Reflections;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 
 /**
  * @author lysu created on 14-4-7 上午2:30

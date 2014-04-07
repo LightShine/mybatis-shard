@@ -3,14 +3,14 @@
  */
 package org.lysu.shard.converter;
 
+import java.util.regex.Pattern;
+
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 
-import java.util.regex.Pattern;
-
 /**
- *
+ * 
  * @author lysu created on 14-4-6 下午3:31
  * @version $Id$
  */

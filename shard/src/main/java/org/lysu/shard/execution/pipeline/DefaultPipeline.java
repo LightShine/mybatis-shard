@@ -1,12 +1,12 @@
 package org.lysu.shard.execution.pipeline;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @author lysu created on 14-4-7 下午11:23
@@ -14,11 +14,9 @@ import java.util.NoSuchElementException;
  */
 public class DefaultPipeline implements Pipeline {
 
-    private volatile DefaultPipeContext head;
-
-    private volatile DefaultPipeContext tail;
-
     private final Map<String, DefaultPipeContext> name2ctx = Maps.newHashMapWithExpectedSize(4);
+    private volatile DefaultPipeContext head;
+    private volatile DefaultPipeContext tail;
 
     public DefaultPipeline() {
     }
@@ -374,13 +372,10 @@ public class DefaultPipeline implements Pipeline {
 
     private final class DefaultPipeContext implements PipeContext {
 
-        volatile DefaultPipeContext next;
-
-        volatile DefaultPipeContext prev;
-
         private final String name;
-
         private final PipeHandler handler;
+        volatile DefaultPipeContext next;
+        volatile DefaultPipeContext prev;
 
         DefaultPipeContext(DefaultPipeContext prev, DefaultPipeContext next, String name, PipeHandler handler) {
 
