@@ -1,19 +1,17 @@
 package org.lysu.shard.locator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.commons.lang3.StringUtils.trim;
+import com.google.common.base.Function;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import groovy.lang.GroovyClassLoader;
+import org.codehaus.groovy.control.CompilationFailedException;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.groovy.control.CompilationFailedException;
-
-import com.google.common.base.Function;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
-import groovy.lang.GroovyClassLoader;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * @author lysu created on 14-4-6 下午10:37
@@ -22,8 +20,8 @@ import groovy.lang.GroovyClassLoader;
 public class GroovyLocator implements Locator {
 
     private static final Pattern VARABLE_SEGMENT = Pattern.compile("\\$.*?\\$");
- private static final Pattern RETURN_SEGMENT = Pattern.compile("\\breturn\\b", Pattern.CASE_INSENSITIVE)}
- private Function<Map, Object> functor}
+    private static final Pattern RETURN_SEGMENT = Pattern.compile("\\breturn\\b", Pattern.CASE_INSENSITIVE);
+    private Function<Map, Object> functor;
 
     public GroovyLocator(String rule) {
         this.functor = generatorFunctorImplement(rule);
@@ -33,7 +31,7 @@ public class GroovyLocator implements Locator {
     public String locate(Map<String, Object> locateParam) {
         Map<String, Object> params = Maps.newHashMap();
         for (Map.Entry<String, Object> rawEntry : locateParam.entrySet()) {
-            params.put(StringUtils.trim(rawEntry.getKey()).toUpperCase(), rawEntry.getValue());
+            params.put(trim(rawEntry.getKey()).toUpperCase(), rawEntry.getValue());
         }
         return (String) this.functor.apply(params);
     }
@@ -61,7 +59,7 @@ public class GroovyLocator implements Locator {
 
         return mapObjectFunction;
 
-    ;
+    }
 
     private String buildGroovyScript(String rule) {
 
@@ -101,7 +99,7 @@ public class GroovyLocator implements Locator {
 
     private String parseTakeVarExp(String var) {
         return "(map.get(\"" + trim(var).toUpperCase() + "\"))";
-    ;
+    }
 
     private boolean hasReturn(String rule) {
         return RETURN_SEGMENT.matcher(rule).find();
