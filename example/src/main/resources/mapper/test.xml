@@ -16,7 +16,11 @@
     <select id="query" resultMap="testMap">
         select id, a, b, c
         from test
-        where a = #{a}
+        <where>
+            <if test="a != null and a != ''">
+                a = #{a}
+            </if>
+        </where>
     </select>
 
     <update id="update" parameterType="map">
