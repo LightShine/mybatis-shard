@@ -1,12 +1,7 @@
 package org.lysu.shard.config;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Map;
-
+import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -17,8 +12,12 @@ import org.lysu.shard.annotation.TableShard;
 import org.lysu.shard.annotation.TableShardWith;
 import org.lysu.shard.tools.Reflections;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author lysu created on 14-4-7 上午2:30
@@ -57,6 +56,9 @@ public enum ExecutionConfigBuilder {
     }
 
     private TableConfig buildTableInfo(Method mapperMethod, TableShard tableAnnotation, Object executeParam) {
+        if(tableAnnotation == null){
+            return null;
+        }
 
         Map<String, Object> params = Maps.newHashMap();
         for (Annotation[] annotations : mapperMethod.getParameterAnnotations()) {
@@ -99,6 +101,9 @@ public enum ExecutionConfigBuilder {
     }
 
     private DataSourceConfig buildDataSourceInfo(Method mapperMethod, DbShard dbShardAnnotation, Object executeParam) {
+        if(dbShardAnnotation == null){
+            return null;
+        }
 
         Map<String, Object> params = Maps.newHashMap();
         for (Annotation[] annotations : mapperMethod.getParameterAnnotations()) {
