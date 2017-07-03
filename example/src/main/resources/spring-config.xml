@@ -9,9 +9,9 @@
 
     <bean id="ds0" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://127.0.0.1:3306/shard0?characterEncoding=UTF-8"/>
-        <property name="username" value="root"/>
-        <property name="password" value=""/>
+        <property name="url" value="jdbc:mysql://172.23.28.52:3306/shard0?characterEncoding=UTF-8"/>
+        <property name="username" value="migu"/>
+        <property name="password" value="1qaz2wsx"/>
         <property name="maxActive" value="30"/>
         <property name="maxIdle" value="10"/>
         <property name="maxWait" value="6000"/>
@@ -23,9 +23,9 @@
 
     <bean id="ds1" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://127.0.0.1:3306/shard1?characterEncoding=UTF-8"/>
-        <property name="username" value="root"/>
-        <property name="password" value=""/>
+        <property name="url" value="jdbc:mysql://172.23.28.52:3306/shard1?characterEncoding=UTF-8"/>
+        <property name="username" value="migu"/>
+        <property name="password" value="1qaz2wsx"/>
         <property name="maxActive" value="30"/>
         <property name="maxIdle" value="10"/>
         <property name="maxWait" value="6000"/>

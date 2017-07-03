@@ -13,7 +13,11 @@
     </typeHandlers>
 
     <plugins>
-        <plugin interceptor="org.lysu.shard.interceptor.PlanExecuteInterceptor"/>
+        <plugin interceptor="org.lysu.shard.interceptor.PlanExecuteInterceptor">
+            <!--如自行实现org.lysu.shard.locator.Locator接口，此处加入property,property的name必须写成“locator”，value为自行实现的Locator实现类，默认使用SpELLocator;-->
+            <!--注意，自行实现的Locator必须要有一个公有构造函数，且参数类型为String-->
+            <!--<property name="locator" value="org.lysu.shard.locator.SpELLocator"/>-->
+        </plugin>
         <plugin interceptor="org.lysu.shard.interceptor.TableShardInterceptor"/>
     </plugins>
 

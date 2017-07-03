@@ -3,10 +3,12 @@
  */
 package org.lysu.shard.converter;
 
-import java.util.regex.Pattern;
-
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.update.Update;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 
@@ -21,10 +23,11 @@ public class UpdateSqlConverter extends AbstractSqlConverter {
             throw new IllegalArgumentException("The argument statement must is instance of Update.");
         }
         Update update = (Update) statement;
-        String name = update.getTable().getName();
-
-        if (includePattern.matcher(name).find()) {
-            update.getTable().setName(this.convertTableName(name, suffix));
+        List<Table> tables = update.getTables();
+        for (Table table : tables) {
+            if (includePattern.matcher(table.getName()).find()) {
+                table.setName(this.convertTableName(table.getName(), suffix));
+            }
         }
         return update;
     }

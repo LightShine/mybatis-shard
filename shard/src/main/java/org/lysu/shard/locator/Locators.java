@@ -1,10 +1,13 @@
 package org.lysu.shard.locator;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.lysu.shard.config.LocatorConfig;
+
+import java.lang.reflect.Constructor;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author lysu created on 14-4-6 下午3:59
@@ -21,7 +24,13 @@ public enum Locators {
             return locateCached.get(rule, new Callable<Locator>() {
                 @Override
                 public Locator call() throws Exception {
-                    return new GroovyLocator(rule);
+                    //如果未设置locator property，那么使用默认的SpElLocator
+                    if(StringUtils.isEmpty(LocatorConfig.getLocater())){
+                        return new SpELLocator(rule);
+                    }
+                    Class locatorClass = Class.forName(LocatorConfig.getLocater());
+                    Constructor<Locator> constructor = locatorClass.getConstructor(String.class);
+                    return constructor.newInstance(rule);
                 }
             });
         } catch (ExecutionException e) {

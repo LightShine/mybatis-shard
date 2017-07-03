@@ -1,15 +1,20 @@
 package org.lysu.shard.interceptor;
 
-import java.util.Properties;
-
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.lysu.shard.config.ExecutionConfig;
 import org.lysu.shard.config.ExecutionConfigBuilder;
+import org.lysu.shard.config.LocatorConfig;
 import org.lysu.shard.context.ExecuteInfoContext;
+
+import java.util.Properties;
 
 /**
  * @author lysu created on 14-4-7 上午1:45
@@ -58,7 +63,8 @@ public class PlanExecuteInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-
+        String locator = properties.getProperty("locator");
+        LocatorConfig.setLocater(locator);
     }
 
 }

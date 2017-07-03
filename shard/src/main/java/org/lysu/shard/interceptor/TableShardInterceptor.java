@@ -1,14 +1,14 @@
 package org.lysu.shard.interceptor;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.sql.Connection;
-import java.util.Properties;
-
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.lysu.shard.config.ExecutionConfig;
 import org.lysu.shard.config.TableConfig;
 import org.lysu.shard.context.ExecuteInfoContext;
@@ -17,13 +17,16 @@ import org.lysu.shard.locator.Locator;
 import org.lysu.shard.locator.Locators;
 import org.lysu.shard.tools.Reflections;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.sql.Connection;
+import java.util.Properties;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author lysu created on 14-4-6 下午4:01
  * @version $Id$
  */
-@Intercepts({ @Signature(type = StatementHandler.class, method = "prepare", args = { Connection.class }) })
+@Intercepts({ @Signature(type = StatementHandler.class, method = "prepare", args = { Connection.class, Integer.class }) })
 public class TableShardInterceptor implements Interceptor {
 
     public Object intercept(Invocation invocation) throws Throwable {
@@ -58,7 +61,11 @@ public class TableShardInterceptor implements Interceptor {
         }
 
         Locator locator = Locators.instance.takeLocator(checkNotNull(tableConfig.getRule()));
+        checkNotNull(locator);
         String targetSuffix = locator.locate(tableConfig.getParams());
+        if(StringUtils.isEmpty(targetSuffix)){
+            return null;
+        }
 
         SqlConverterFactory converterFactory = SqlConverterFactory.getInstance();
         return converterFactory.convert(boundSql.getSql(), targetSuffix, checkNotNull(tableConfig.getTablePattern()));

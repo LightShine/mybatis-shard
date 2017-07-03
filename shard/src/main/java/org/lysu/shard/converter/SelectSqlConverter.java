@@ -3,11 +3,21 @@
  */
 package org.lysu.shard.converter;
 
-import java.util.regex.Pattern;
-
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.select.FromItemVisitor;
+import net.sf.jsqlparser.statement.select.LateralSubSelect;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectVisitor;
+import net.sf.jsqlparser.statement.select.SetOperationList;
+import net.sf.jsqlparser.statement.select.SubJoin;
+import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.statement.select.TableFunction;
+import net.sf.jsqlparser.statement.select.ValuesList;
+import net.sf.jsqlparser.statement.select.WithItem;
+
+import java.util.regex.Pattern;
 
 /**
  * 
@@ -80,6 +90,11 @@ public class SelectSqlConverter extends AbstractSqlConverter {
 
         @Override
         public void visit(ValuesList valuesList) {
+
+        }
+
+        @Override
+        public void visit(TableFunction tableFunction) {
 
         }
     }
